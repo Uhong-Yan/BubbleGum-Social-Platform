@@ -7,7 +7,7 @@
 
 *  **[專題技術報告 (PDF)](Social_platform_Project_Report.pdf)**
     > *含系統架構圖、資料庫 Schema 設計與小組分工細節。*
-*  **[前端介面原始碼 (HTML/CSS)](public/)**
+*  **[前端介面原始碼 (HTML/CSS)](socialwebsite-main/socialwebsite-main)**
     > *包含註冊、登入、首頁及個人主頁的切版實作。*
 
 ## 核心功能與架構
