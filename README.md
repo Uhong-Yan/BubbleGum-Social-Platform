@@ -5,10 +5,9 @@
 ## 專案演示與文檔
 本倉庫展示了從介面設計到全端系統部署的完整開發歷程：
 
-*  **[專題技術報告 (PDF)](Social_platform_Project_Report.pdf)**
-    > *含系統架構圖、資料庫 Schema 設計與小組分工細節。*
-*  **[前端介面原始碼 (HTML/CSS)](socialwebsite-main/socialwebsite-main)**
-    > *包含註冊、登入、首頁及個人主頁的切版實作。*
+*  **[專題完整報告 (PDF)](Social_platform_Project_Report.pdf)**
+*  **[全端專案原始碼](socialwebsite-main/socialwebsite-main)**
+    > *包含 Node.js 後端邏輯、Firebase 配置及前端靜態資源。*
 
 ## 核心功能與架構
 * **雲端部署**：系統託管於 **Heroku**，實現公網可訪問的動態網站。
@@ -27,11 +26,6 @@
    - 負責全站視覺風格的調整與維護，優化按鈕、輸入框等交互元素的 UI 反饋。
 3. **全端協作經驗**：
    - 雖然主要負責前端，但在開發過程中需理解 **Node.js** 與 **Firebase** 的運作邏輯，以調整 HTML 結構來配合後端數據的串接與動態渲染。
-
-##  專案結構導覽
-* **前端資源**：`public/` (包含我負責的所有 HTML 與 CSS 檔案)。
-* **後端邏輯**：`index.js`, `app.js` (由小組成員實作，我負責與其接口對接)。
-* **環境配置**：`.firebase/`, `package.json` (相關部署配置文件)。
 
 ## 開發技術棧
 * **前端**：HTML5, CSS3, JavaScript
