@@ -3,11 +3,10 @@
 本專案為「Web 基本原理與技術」課程之期末作品，開發一個功能完整的社交動態網站。系統採用 **Node.js** 運算環境，並成功部署於 **Heroku** 雲端平台，結合 **Firebase** 與 **JawsDB MySQL** 實現複雜的資料存取與用戶管理。
 
 ## 專案演示與文檔
-本倉庫展示了從介面設計到全端系統部署的完整開發歷程：
+展示了從介面設計到全端系統部署的完整開發歷程：
 
 *  **[專題完整報告 (PDF)](Social_platform_Project_Report.pdf)**
 *  **[全端專案原始碼](socialwebsite-main/socialwebsite-main)**
-    > *包含 Node.js 後端邏輯、Firebase 配置及前端靜態資源。*
 
 ## 核心功能與架構
 * **雲端部署**：系統託管於 **Heroku**，實現公網可訪問的動態網站。
