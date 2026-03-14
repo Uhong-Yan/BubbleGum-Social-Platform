@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>泡泡糖社交</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .header {
+            background-color: #6c8ba4; /* 主題淺藍色 */
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        .user-icon {
+            cursor: pointer;
+            background-color: #d9d9d9;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .dropdown-menu a {
+            display: block;
+            padding: 10px 20px;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .dropdown-menu a:hover {
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            display: flex;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .main-content {
+            flex: 3;
+            margin-right: 20px;
+        }
+
+        .side-content {
+            flex: 1;
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .post-form {
+            background: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .post-form textarea, .post-form button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .post-form button {
+            background-color: #6c8ba4;
+            color: white;
+            cursor: pointer;
+        }
+
+        .post-card {
+            background: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .interaction-buttons button {
+            margin-right: 10px;
+            background-color: #6c8ba4;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .interaction-buttons button:hover {
+            background-color: #5a728a;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .popup {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .popup button {
+            margin: 10px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .popup .login {
+            background-color: #2d82c7;
+            color: white;
+        }
+
+        .popup .register {
+            background-color: #5b9bd5;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- 頁首 -->
+    <header class="header">
+        <h1>泡泡糖社交</h1>
+        <div class="user-menu">
+            <div class="user-icon" onclick="toggleDropdown()">👤</div>
+            <div class="dropdown-menu" id="dropdownMenu">
+                <a href="home.html">個人主頁</a>
+                <a href="login.html">登入</a>
+                <a href="register.html">註冊</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主內容 -->
+    <div class="container">
+        <!-- 發文區 -->
+        <main class="main-content">
+            <div class="post-form">
+                <textarea id="newPostContent" rows="3" placeholder="寫點什麼..."></textarea>
+                <button onclick="addPost()">發佈</button>
+            </div>
+
+            <!-- 動態貼文 -->
+            <div id="feedContainer"></div>
+        </main>
+
+        <!-- 右側欄位 -->
+        <aside class="side-content">
+            <h3>其他文章</h3>
+            <ul id="otherPosts"></ul>
+        </aside>
+    </div>
+
+    <!-- 登入詢問視窗 -->
+    <div class="overlay" id="loginOverlay" onclick="closePopup()">
+        <div class="popup" onclick="event.stopPropagation()">
+            <p>您需要先登入或註冊才能執行此操作！</p>
+            <button class="login" onclick="window.location.href='login.html'">登入</button>
+            <button class="register" onclick="window.location.href='register.html'">註冊</button>
+        </div>
+    </div>
+
+    <script>
+        let isLoggedIn = false;
+        const apiUrl = 'http://localhost:3000';
+
+        function toggleDropdown() {
+            const dropdownMenu = document.getElementById('dropdownMenu');
+            dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function showPopup() {
+            const loginOverlay = document.getElementById('loginOverlay');
+            loginOverlay.style.display = 'flex';// 顯示彈窗
+        }
+
+        function closePopup() {
+            const loginOverlay = document.getElementById('loginOverlay');
+            loginOverlay.style.display = 'none';// 關閉彈窗
+        }
+
+        async function addPost() {
+            if (!isLoggedIn) {
+                showPopup(); //顯示未登入提示
+                return;
+            }
+
+            const content = document.getElementById('newPostContent').value;
+            if (!content.trim()) {
+                alert('請輸入內容');
+                return;
+            }
+
+            const post = { content, date: new Date().toISOString() };
+            // 發送貼文到伺服器
+            try {
+                const response = await fetch(`${apiUrl}/posts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(post)
+                });
+
+                if (response.ok) {
+                    document.getElementById('newPostContent').value = '';
+                    renderPosts();// 重新渲染貼文
+                } else {
+                    alert('發佈失敗');
+                }
+            } catch (error) {
+                console.error('發佈貼文失敗:', error);
+            }
+        }
+
+        async function renderPosts() {
+            try {
+                const response = await fetch(`${apiUrl}/posts`);
+                const posts = await response.json();
+
+                const feedContainer = document.getElementById('feedContainer');
+                const otherPosts = document.getElementById('otherPosts');
+
+                feedContainer.innerHTML = '';
+                otherPosts.innerHTML = '';
+
+                posts.forEach((post, index) => {
+                    feedContainer.innerHTML += `
+                        <div class="post-card">
+                            <p>${post.content}</p>
+                            <small>${new Date(post.date).toLocaleString()}</small>
+                            <div class="interaction-buttons">
+                                <button onclick="showPopup()">👍 按讚</button>
+                                <button onclick="showPopup()">💬 留言</button>
+                            </div>
+                        </div>
+                    `;
+
+                    if (index < 4) {
+                        otherPosts.innerHTML += `<li><a href="#">${post.content}</a></li>`;
+                    }
+                });
+            } catch (error) {
+                console.error('載入貼文失敗:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', renderPosts);
+    </script>
+</body>
+</html>

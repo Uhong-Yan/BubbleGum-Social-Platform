@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>泡泡糖社交 - 個人主頁</title>
+    <link rel="stylesheet" href="Client/css/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .header {
+            background-color: #6c8ba4; /* 主題藍色 */
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        .user-icon {
+            cursor: pointer;
+            background-color: #d9d9d9;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .dropdown-menu a {
+            display: block;
+            padding: 10px 20px;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .dropdown-menu a:hover {
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .profile-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-section h2 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .profile-section textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .profile-section button {
+            background-color: #6c8ba4; /* 按鈕主題色 */
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .profile-section button:hover {
+            background-color: #5a728a; /* 按鈕 hover 顏色 */
+        }
+
+        .post-form {
+            background: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .post-form textarea, .post-form button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .post-form button {
+            background-color: #6c8ba4; /* 按鈕主題色 */
+            color: white;
+            cursor: pointer;
+        }
+
+        .post-card {
+            background: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- 頁首 -->
+    <header class="header">
+        <h1>泡泡糖社交 - 個人主頁</h1>
+        <div class="user-menu">
+            <div class="user-icon" onclick="toggleDropdown()">👤</div>
+            <div class="dropdown-menu" id="dropdownMenu">
+                <a href="index.html">首頁</a>
+                <a href="home.html">個人主頁</a>
+                <a href="login.html">登入</a>
+                <a href="register.html">註冊</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主內容 -->
+    <div class="container">
+        <!-- 個人檔案 -->
+        <section class="profile-section" id="profileSection">
+            <h2>個人檔案</h2>
+            <p>載入中...</p>
+        </section>
+
+        <!-- 發文區 -->
+        <div class="post-form">
+            <h3>新增貼文</h3>
+            <textarea id="newPostContent" rows="3" placeholder="寫點什麼..."></textarea>
+            <button onclick="addPost()">發佈</button>
+        </div>
+
+        <!-- 貼文列表 -->
+        <div id="feedContainer">
+            <!-- 動態生成貼文 -->
+        </div>
+    </div>
+
+    <script>
+        const apiUrl = 'http://localhost:3000'; // 假設後端 API 地址
+        const userId = 1; // 假設當前登入用戶 ID
+
+        // 動態渲染個人檔案
+        async function renderProfile() {
+            try {
+                const response = await fetch(`${apiUrl}/users/${userId}`);
+                const user = await response.json();
+
+                const profileSection = document.getElementById('profileSection');
+                profileSection.innerHTML = `
+                    <h2>個人檔案</h2>
+                    <p>使用者名稱：<strong>${user.username}</strong></p>
+                    <textarea id="bioInput">${user.bio}</textarea>
+                    <button onclick="updateProfile()">更新個人介紹</button>
+                `;
+
+                // 同時渲染個人貼文
+                renderPosts(user.posts);
+            } catch (error) {
+                console.error('無法載入個人檔案:', error);
+            }
+        }
+
+        // 更新個人介紹
+        async function updateProfile() {
+            const bio = document.getElementById('bioInput').value;
+
+            try {
+                const response = await fetch(`${apiUrl}/users/${userId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ bio })
+                });
+
+                if (response.ok) {
+                    alert('個人介紹已更新！');
+                    renderProfile(); // 重新渲染檔案
+                } else {
+                    alert('更新失敗');
+                }
+            } catch (error) {
+                console.error('更新個人檔案失敗:', error);
+            }
+        }
+
+        // 動態渲染貼文
+        function renderPosts(posts) {
+            const feedContainer = document.getElementById('feedContainer');
+            feedContainer.innerHTML = '';
+
+            posts.forEach(post => {
+                const postCard = `
+                    <div class="post-card">
+                        <p>${post.content}</p>
+                        <small>${new Date(post.date).toLocaleString()}</small>
+                    </div>`;
+                feedContainer.innerHTML += postCard;
+            });
+        }
+
+        // 發佈新貼文
+        async function addPost() {
+            const content = document.querySelector('#newPostContent').value;
+            if (!content) {
+                alert('請輸入貼文內容');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${apiUrl}/posts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, content, date: new Date().toISOString() })
+                });
+
+                if (response.ok) {
+                    document.querySelector('#newPostContent').value = '';
+                    renderProfile(); // 重新渲染個人資料和貼文
+                } else {
+                    alert('發佈貼文失敗');
+                }
+            } catch (error) {
+                console.error('發佈貼文時出現錯誤:', error);
+            }
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProfile();
+        });
+    </script>
+</body>
+</html>
+
+
